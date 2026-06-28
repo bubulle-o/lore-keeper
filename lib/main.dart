@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lore_keeper/providers/note_provider.dart';
+import 'package:lore_keeper/providers/settings_provider.dart';
 import 'package:provider/provider.dart';
 import 'providers/folder_provider.dart';
 import 'screens/home_screen.dart';
@@ -11,6 +13,8 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => FolderProvider()),
+        ChangeNotifierProvider(create: (_) => NoteProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider())
       ],
       child: const MyApp(),
     ),

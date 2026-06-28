@@ -89,7 +89,7 @@ class FolderService {
       nameOk = await db.rawQuery('select name from folders where parentFolder = ?', [newParent]);
     }
 
-    if(!nameOk.any((map) => map['name'] == newName)){
+    if(!nameOk.any((map) => map['name'] == newName) || newName == folder.name ){
       await db.update('folders', 
       {'name': newName, 'parentFolder' : newParent},
       where : 'id = ?',
@@ -125,7 +125,7 @@ class FolderService {
     if(folder == null){
       maps = await db.rawQuery('SELECT * FROM folders WHERE name LIKE ? AND parentFolder IS null',['%$query%']);
     } else {
-      maps = await db.rawQuery('SELECT * FROM folders WHERE name LIKE ? AND parentFolder = ?',['%$query%' , folder.parentFolder]);
+      maps = await db.rawQuery('SELECT * FROM folders WHERE name LIKE ? AND parentFolder = ?',['%$query%' , folder.id]);
     }
     List<Folder> folders = [];
     for (Map<String, Object?> data in maps) {

@@ -7,7 +7,8 @@ import 'folder_screen.dart';
 class FolderSearchDelegate extends SearchDelegate {
   Folder? folder;
 
-  FolderSearchDelegate(this.folder){}
+  FolderSearchDelegate(this.folder);
+  
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -31,6 +32,7 @@ class FolderSearchDelegate extends SearchDelegate {
     return _buildSearchResults(context);
   }
 
+  @override
   Widget buildSuggestions(BuildContext context) {
     if (query.isEmpty) return Center(child: Text('Tapez pour chercher...'));
     context.read<FolderProvider>().searchFolders(query, folder );

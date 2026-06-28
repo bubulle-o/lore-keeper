@@ -1,4 +1,7 @@
 
+import 'package:lore_keeper/providers/note_provider.dart';
+import 'package:lore_keeper/screens/folder_search_delegate.dart';
+import 'package:lore_keeper/screens/note_read_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:lore_keeper/models/folder.dart';
@@ -23,17 +26,31 @@ class _FolderScreenState extends State<FolderScreen>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     Future.microtask(() => 
-      context.read<FolderProvider>().loadFolders(widget.folder.id)
+      context.read<FolderProvider>().loadFolders(widget.folder.id)  
+    );
+
+    Future.microtask(() => 
+      context.read<NoteProvider>().loadNotes(widget.folder.id)
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<FolderProvider>();
+    final folderProvider = context.watch<FolderProvider>();
+    final noteProvider = context.watch<NoteProvider>();
     
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.folder.name),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () => showSearch(
+              context: context,
+              delegate: FolderSearchDelegate(widget.folder),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -48,9 +65,9 @@ class _FolderScreenState extends State<FolderScreen>
         controller: _tabController,
         children: [
           ListView.builder(
-            itemCount: provider.getFolders(widget.folder.id).length,
+            itemCount: folderProvider.getFolders(widget.folder.id).length,
             itemBuilder: (context, index) {
-              final folder = provider.getFolders(widget.folder.id)[index];
+              final folder = folderProvider.getFolders(widget.folder.id)[index];
               return GestureDetector(
                 onSecondaryTapUp: (details) {
                   showMenu(
@@ -82,9 +99,9 @@ class _FolderScreenState extends State<FolderScreen>
             },
           ),
           ListView.builder(
-            itemCount: provider.getFolders(widget.folder.id).length,
+            itemCount: folderProvider.getFolders(widget.folder.id).length,
             itemBuilder: (context, index) {
-              final childFolder = provider.getFolders(widget.folder.id)[index];
+              final childFolder = folderProvider.getFolders(widget.folder.id)[index];
               return ListTile(
                 title: Text(childFolder.name),
                 onTap: () => Navigator.push(
@@ -94,7 +111,19 @@ class _FolderScreenState extends State<FolderScreen>
               );
             },
           ),
-          Center(child: Text('Notes - à venir')),
+          ListView.builder(
+            itemCount: noteProvider.getNotes(widget.folder.id).length,
+            itemBuilder: (context, index) {
+              final childNote = noteProvider.getNotes(widget.folder.id)[index];
+              return ListTile(
+                title: Text(childNote.name),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NoteReadScreen(note: childNote)),
+                ).then((_) => context.read<FolderProvider>().loadFolders(null)),
+              );
+            },
+          ),
           Center(child: Text('Fiches - à venir')),
         ],
       ),

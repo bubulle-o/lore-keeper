@@ -46,18 +46,19 @@ class NoteService {
     return note;
   }
 
-  Future<void> changeNote(String id, String? newName, String? newParent) async {
+  Future<void> changeNote(String id, String? newName, String? newParent, String? newContent) async {
     final db = await DatabaseHelper().database;
     Note note = await loadNote(id);
     newName ??= note.name;
     newParent ??= note.parentFolder;
+    newContent ??= note.content;
 
     List<Map<String, Object?>> nameOk = await db.rawQuery('select name from notes where parentFolder = ?', [newParent]);
     
 
-    if(!nameOk.any((map) => map['name'] == newName)){
+    if(!nameOk.any((map) => map['name'] == newName) || newName == note.name){
       await db.update('notes', 
-      {'name': newName, 'parentFolder' : newParent},
+      {'name': newName, 'parentFolder' : newParent, 'content' : newContent},
       where : 'id = ?',
       whereArgs: [id]);
     }

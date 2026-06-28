@@ -55,38 +55,45 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.note.name),
-        actions: [
-          // Bouton pour basculer entre classic et markdown
-          IconButton(
-            icon: Icon(
-              _writingMode == NoteMode.classic 
-                ? Icons.code        // icône "code" quand on est en classic
-                : Icons.edit,       // icône "edit" quand on est en markdown
-            ),
-            onPressed: _toggleWritingMode,
-          ),
-          // Bouton enregistrer
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveNote,
-          ),
-          
-
-          // Bouton compiler
-          if (_writingMode == NoteMode.markdown)
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _showSaveDialog(context);
+      },
+      child : Scaffold(
+        appBar: AppBar(
+          title: Text(widget.note.name),
+          actions: [
+            // Bouton pour basculer entre classic et markdown
             IconButton(
-              icon : Icon(Icons.play_arrow),
-              tooltip : 'compiler',
-              onPressed: _compile,
+              icon: Icon(
+                _writingMode == NoteMode.classic 
+                  ? Icons.code        // icône "code" quand on est en classic
+                  : Icons.edit,       // icône "edit" quand on est en markdown
+              ),
+              onPressed: _toggleWritingMode,
             ),
-        ],
+            // Bouton enregistrer
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: _saveNote,
+            ),
+            
+
+            // Bouton compiler
+            if (_writingMode == NoteMode.markdown)
+              IconButton(
+                icon : Icon(Icons.play_arrow),
+                tooltip : 'compiler',
+                onPressed: _compile,
+              ),
+          ],
+        ),
+        body: _writingMode == NoteMode.classic 
+          ? _buildClassicEditor()
+          : _buildMarkdownEditor(),
       ),
-      body: _writingMode == NoteMode.classic 
-        ? _buildClassicEditor()
-        : _buildMarkdownEditor(),
     );
   }
 
@@ -156,5 +163,31 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
       _renderedContent = _controller.text;
     });
      _saveNote();
+  }
+
+  Future<void> _showSaveDialog(BuildContext context)async{
+    final TextEditingController controller = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Vous allez quitter la note. Voulez vous sauvegarder les modifications ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Non'),
+          ),
+          TextButton(
+            onPressed: () async {
+              _saveNote();
+              Navigator.pop(context);
+              
+            },
+      
+            child: Text('Oui'),
+          ),
+        ],
+      ),
+    );
   }
 }

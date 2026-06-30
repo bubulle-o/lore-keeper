@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:lore_keeper/screens/folder_screen.dart';
-import 'package:lore_keeper/screens/folder_search_delegate.dart';
+import 'package:mythopolis/screens/folder_screen.dart';
+import 'package:mythopolis/screens/folder_search_delegate.dart';
 import 'package:provider/provider.dart';
 import '../providers/folder_provider.dart';
-import 'package:lore_keeper/models/folder.dart';
+import 'package:mythopolis/models/folder.dart';
 
+
+//////////////////////////////////////////////////////
+//                 WIDGET PRINCIPAL                 //
+//////////////////////////////////////////////////////
+
+/// Écran d'accueil — affiche les dossiers à la racine (parentFolder = null).
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,22 +19,32 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
+
+  //////////////////////////////////////////////////////
+  //                 INITIALISATION                   //
+  //////////////////////////////////////////////////////
+
   @override
   void initState() {
     super.initState();
-    // appelé une seule fois au chargement
-    Future.microtask(() => 
+    // Charge les dossiers racine au premier affichage
+    Future.microtask(() =>
       context.read<FolderProvider>().loadFolders(null)
     );
   }
 
+
+  //////////////////////////////////////////////////////
+  //                     BUILD                        //
+  //////////////////////////////////////////////////////
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<FolderProvider>();
-    
+
     return Scaffold(
-      appBar: AppBar(title: Text('Lore Keeper'),
+      appBar: AppBar(
+        title: Text('Mythopolis'),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
@@ -66,25 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: ListTile(
               title: Text(folder.name),
-              onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => FolderScreen(folder: folder)),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FolderScreen(folder: folder)),
               ).then((_) => context.read<FolderProvider>().loadFolders(null)),
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showCreateFolderDialog(context);
-        },
+        onPressed: () => _showCreateFolderDialog(context),
         child: Icon(Icons.add),
       ),
     );
   }
 
+
+  //////////////////////////////////////////////////////
+  //                   DIALOGUES                      //
+  //////////////////////////////////////////////////////
+
   void _showCreateFolderDialog(BuildContext context) {
     final TextEditingController controller = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -122,10 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   void _showRenameDialog(BuildContext context, Folder folder) {
     final TextEditingController controller = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -144,9 +163,9 @@ class _HomeScreenState extends State<HomeScreen> {
               if (controller.text.isNotEmpty) {
                 try {
                   await context.read<FolderProvider>().changeFolder(
-                    folder.id ,
+                    folder.id,
                     controller.text,
-                    folder.parentFolder
+                    folder.parentFolder,
                   );
                   Navigator.pop(context);
                 } catch (e) {
@@ -166,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showMoveDialog(BuildContext context, Folder folder) async {
     List<Folder> allFolders = await context.read<FolderProvider>().getAllFolders();
     List<Map<String, dynamic>> tree = _buildFolderTree(allFolders, null, 0, folder.id);
-    String? selectedId = folder.parentFolder; // sélection actuelle
+    String? selectedId = folder.parentFolder;
 
     showDialog(
       context: context,
@@ -178,14 +197,12 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 400,
             child: ListView(
               children: [
-                // Option Bureau (racine)
                 ListTile(
                   leading: Icon(Icons.home),
                   title: Text('Bureau'),
                   selected: selectedId == null,
                   onTap: () => setState(() => selectedId = null),
                 ),
-                // Dossiers
                 ...tree.map((item) {
                   Folder f = item['folder'];
                   int depth = item['depth'];
@@ -228,10 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   void _showDeleteDialog(BuildContext context, Folder folder) {
-    final TextEditingController controller = TextEditingController();
-    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -246,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
               try {
                 await context.read<FolderProvider>().deleteFolder(
                   folder.id,
-                  folder.parentFolder
+                  folder.parentFolder,
                 );
                 Navigator.pop(context);
               } catch (e) {
@@ -262,8 +276,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
-  List<Map<String, dynamic>> _buildFolderTree(List<Folder> allFolders, String? parentId, int depth, String excludeId) {
+
+  //////////////////////////////////////////////////////
+  //                   UTILITAIRES                    //
+  //////////////////////////////////////////////////////
+
+  /// Construit récursivement l'arbre de dossiers pour le dialogue de déplacement.
+  /// excludeId : le dossier qu'on déplace (ne doit pas apparaître comme destination).
+  List<Map<String, dynamic>> _buildFolderTree(
+      List<Folder> allFolders, String? parentId, int depth, String excludeId) {
     List<Map<String, dynamic>> result = [];
     for (Folder folder in allFolders) {
       if (folder.parentFolder == parentId && folder.id != excludeId) {

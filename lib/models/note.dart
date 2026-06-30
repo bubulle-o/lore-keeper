@@ -1,64 +1,46 @@
-class Note{
-    
-    String name ;
-    String parentFolder ;
-    String id;
-    String? iconPath ;
-    String? content;
-    String? bookmarks;
-    
+//////////////////////////////////////////////////////
+//                     MODÈLE                       //
+//////////////////////////////////////////////////////
 
-    
-    Note( this.id, this.name, this.parentFolder, this.iconPath, this.content, this.bookmarks){
-/*
-        Initialise un nouveau note
-        
-        Args:
-            name: Nom de note
-            iconPath: Chemin vers l'icône (optionnel)
-            parentFolder: Nom du note parent (optionnel)
-            id: Identifiant unique du note
-        
-*/        
+/// Représente une note textuelle appartenant à un dossier.
+/// Le contenu est stocké au format Delta JSON (flutter_quill).
+class Note {
 
-    }
+  String id;
+  String name;
+  String parentFolder; // toujours rattachée à un dossier
+  String? iconPath;
+  String? content;   // Delta JSON produit par flutter_quill
+  String? bookmarks; // signets éventuels (non encore implémentés)
+
+  Note(this.id, this.name, this.parentFolder, this.iconPath, this.content, this.bookmarks);
 
 
-    Map<String, dynamic> toMap(){
-/*
-        Convertit le note en dictionnaire pour sauvegarder en JSON
-        
-        Returns:
-            dict: Toutes les infos du note
-*/
+  //////////////////////////////////////////////////////
+  //                  SÉRIALISATION                   //
+  //////////////////////////////////////////////////////
 
-        return {
-            "id" : id,
-            "name": name,
-            "parentFolder" : parentFolder ,
-            "iconPath": iconPath,
-            "content" : content,
-            "bookmarks" : bookmarks
-          };
-      }
+  /// Convertit la note en Map pour insertion en base de données.
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "name": name,
+      "parentFolder": parentFolder,
+      "iconPath": iconPath,
+      "content": content,
+      "bookmarks": bookmarks,
+    };
+  }
 
-
-
-
-    static Note fromMap(Map<String, dynamic> data){
-/*
-        Crée un objet Note depuis un dictionnaire
-            
-        Args:
-            data: Dictionnaire contenant les infos du note
-            
-        Returns:
-            Note: Un nouvel objet Note
-*/
-
-        Note note = Note(data["id"], data["name"],  data["parentFolder"], data["iconPath"], data["content"], data["bookmarks"] 
-        );
-        return note;
-    }
-
+  /// Crée un objet Note depuis une Map issue de la base de données.
+  static Note fromMap(Map<String, dynamic> data) {
+    return Note(
+      data["id"],
+      data["name"],
+      data["parentFolder"],
+      data["iconPath"],
+      data["content"],
+      data["bookmarks"],
+    );
+  }
 }

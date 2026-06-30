@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:lore_keeper/models/folder.dart';
-import 'package:lore_keeper/models/note.dart';
-import 'package:lore_keeper/screens/folder_screen.dart';
-import 'package:lore_keeper/screens/note_edit_screen.dart';
-import 'package:lore_keeper/services/folder_service.dart';
+import 'package:mythopolis/models/folder.dart';
+import 'package:mythopolis/models/note.dart';
+import 'package:mythopolis/screens/folder_screen.dart';
+import 'package:mythopolis/screens/note_edit_screen.dart';
+import 'package:mythopolis/services/folder_service.dart';
 import 'dart:convert';
-
-import 'package:lore_keeper/services/note_service.dart';
+import 'package:mythopolis/services/note_service.dart';
 
 
 //////////////////////////////////////////////////////
@@ -82,16 +81,12 @@ class _NoteReadScreenState extends State<NoteReadScreen> {
         child: QuillEditor.basic(
           controller: _quillController,
           config: QuillEditorConfig(
-            onLaunchUrl : _handleLinkTap,
+            onLaunchUrl: _handleLinkTap,
             embedBuilders: FlutterQuillEmbeds.editorBuilders(),
-          
           ),
         ),
       ),
-      
     );
-
-    
   }
 
 
@@ -110,30 +105,30 @@ class _NoteReadScreenState extends State<NoteReadScreen> {
   }
 
 
-  Future<void> _handleLinkTap(String url)async{
-    if(url.substring(8).startsWith('note_')){
+  //////////////////////////////////////////////////////
+  //                     LIENS                        //
+  //////////////////////////////////////////////////////
+
+  /// Gère les liens internes de l'application.
+  /// Un lien vers une note ou un dossier ouvre l'écran correspondant,
+  /// les autres liens sont ignorés.
+  Future<void> _handleLinkTap(String url) async {
+    if (url.substring(8).startsWith('note_')) {
       Note note = await NoteService().loadNote(url.substring(8));
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => NoteReadScreen(note: note),
-        ),
+        MaterialPageRoute(builder: (context) => NoteReadScreen(note: note)),
       );
     }
 
-    if(url.substring(8).startsWith('folder_')){
+    if (url.substring(8).startsWith('folder_')) {
       Folder folder = await FolderService().loadFolder(url.substring(8));
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => FolderScreen(folder: folder),
-        ),
+        MaterialPageRoute(builder: (context) => FolderScreen(folder: folder)),
       );
-    }
-
-    else {
+    } else {
       return;
     }
-
   }
 }

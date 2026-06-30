@@ -1,61 +1,40 @@
-/// Représente un dossier de fiches
-class Folder{
-    
-    String name ;
-    String? parentFolder ;
-    String id;
-    String? iconPath ;
-    
+//////////////////////////////////////////////////////
+//                     MODÈLE                       //
+//////////////////////////////////////////////////////
 
-    
-    Folder( this.id, this.name, this.parentFolder, this.iconPath){
-/*
-        Initialise un nouveau dossier
-        
-        Args:
-            name: Nom du dossier
-            iconPath: Chemin vers l'icône (optionnel)
-            parentFolder: Nom du dossier parent (optionnel)
-            id: Identifiant unique du dossier
-        
-*/        
+/// Représente un dossier pouvant contenir des notes, des fiches
+/// et d'autres dossiers (structure arborescente).
+class Folder {
 
-    }
+  String id;
+  String name;
+  String? parentFolder; // null si le dossier est à la racine
+  String? iconPath;
+
+  Folder(this.id, this.name, this.parentFolder, this.iconPath);
 
 
-    Map<String, dynamic> toMap(){
-/*
-        Convertit le dossier en dictionnaire pour sauvegarder en JSON
-        
-        Returns:
-            dict: Toutes les infos du dossier
-*/
+  //////////////////////////////////////////////////////
+  //                  SÉRIALISATION                   //
+  //////////////////////////////////////////////////////
 
-        return {
-            "id" : id,
-            "name": name,
-            "iconPath": iconPath,
-            "parentFolder" : parentFolder ,
-          };
-      }
+  /// Convertit le dossier en Map pour insertion en base de données.
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "name": name,
+      "iconPath": iconPath,
+      "parentFolder": parentFolder,
+    };
+  }
 
-
-
-
-    static Folder fromMap(Map<String, dynamic> data){
-/*
-        Crée un objet Folder depuis un dictionnaire
-            
-        Args:
-            data: Dictionnaire contenant les infos du dossier
-            
-        Returns:
-            Folder: Un nouvel objet Folder
-*/
-
-        Folder folder = Folder(data["id"], data["name"],  data["parentFolder"], data["iconPath"] 
-        );
-        return folder;
-    }
-
+  /// Crée un objet Folder depuis une Map issue de la base de données.
+  static Folder fromMap(Map<String, dynamic> data) {
+    return Folder(
+      data["id"],
+      data["name"],
+      data["parentFolder"],
+      data["iconPath"],
+    );
+  }
 }

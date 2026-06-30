@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:lore_keeper/models/note.dart';
-import 'package:lore_keeper/providers/note_provider.dart';
-import 'package:lore_keeper/screens/note_read_screen.dart';
+import 'package:mythopolis/models/note.dart';
+import 'package:mythopolis/providers/note_provider.dart';
+import 'package:mythopolis/screens/note_read_screen.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
@@ -81,7 +81,6 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
               icon: const Icon(Icons.remove_red_eye_rounded),
               onPressed: () => _goToReadScreen(context),
             ),
-        
           ],
         ),
         body: _buildEditor(),
@@ -120,8 +119,6 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
             ),
           ),
         ),
-
-        
 
         // Zone d'édition avec marges latérales
         Expanded(
@@ -189,11 +186,12 @@ class _NoteEditScreenState extends State<NoteEditScreen> {
     );
   }
 
+
   //////////////////////////////////////////////////////
   //                   NAVIGATION                     //
   //////////////////////////////////////////////////////
 
-  /// Navigation vers l'écran d'édition
+  /// Navigation vers l'écran de lecture
   void _goToReadScreen(BuildContext context) {
     Navigator.push(
       context,
